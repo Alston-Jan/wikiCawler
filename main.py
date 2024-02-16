@@ -1,7 +1,14 @@
 import argparse
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+# from urllib.parse import urlparse
+import re
+
+def remove_numeric_and_specific_substrings(input_string):
+    # 使用正则表达式匹配所有包含数字和特定文本的子字符串
+    pattern = r"\[[^\]]*\]|\[需要較佳來源\]"  # 匹配形如 [数字] 的子字符串和特定文本
+    result = re.sub(pattern, "", input_string)  # 用空字符串替换匹配到的子字符串
+    return result
 
 
 def fetch_wikipedia_content(url):
