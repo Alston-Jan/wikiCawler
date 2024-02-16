@@ -45,7 +45,7 @@ def fetch_wikipedia_content(url):
         for paragraph in paragraphs:
             paragraph = remove_numeric_and_specific_substrings(paragraph.text)
             if(paragraph != "\n"):
-                content += (title + paragraph + "\n")
+                content += (title + "\n" + paragraph + "\n")
 
         return content
     else:
