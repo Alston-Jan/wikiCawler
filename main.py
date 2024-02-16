@@ -1,21 +1,30 @@
 import argparse
 import requests
 from bs4 import BeautifulSoup
+
 # from urllib.parse import urlparse
 import re
+
 
 def remove_numeric_and_specific_substrings(input_string):
     # 使用正则表达式匹配所有包含数字和特定文本的子字符串
     pattern = r"\[[^\]]*\]|\[需要較佳來源\]"  # 匹配形如 [数字] 的子字符串和特定文本
     result = re.sub(pattern, "", input_string)  # 用空字符串替换匹配到的子字符串
+    print(result)
     return result
+
+
+def findTitle(inputString):
+    firstPeriod = inputString.find("。")
+    title = inputString[: firstPeriod + 1]
+    return title
 
 
 def fetch_wikipedia_content(url):
     # 發送 GET 請求
-    if("http" not in url):
-        url="https://zh.wikipedia.org/wiki/"+url
-        
+    if "http" not in url:
+        url = "https://zh.wikipedia.org/wiki/" + url
+
     response = requests.get(url)
 
     # 檢查響應的狀態碼
@@ -29,10 +38,14 @@ def fetch_wikipedia_content(url):
         # 提取所有段落內容
         paragraphs = content_div.find_all("p")
 
+        title = findTitle(paragraphs[0].text)
+        print(title)
         # 創建空字串以保存內容
         content = ""
         for paragraph in paragraphs:
-            content += paragraph.text + "\n"
+            paragraph = remove_numeric_and_specific_substrings(paragraph.text)
+            if(paragraph != "\n"):
+                content += (title + paragraph + "\n")
 
         return content
     else:
@@ -52,11 +65,11 @@ def main():
     args = parser.parse_args()
 
     # 擷取URL並爬取內容
-    content= None
-    if(args.url):
+    content = None
+    if args.url:
         url = args.url
         content = fetch_wikipedia_content(url)
-    elif(args.topic):
+    elif args.topic:
         topic = args.topic
         content = fetch_wikipedia_content(topic)
 
